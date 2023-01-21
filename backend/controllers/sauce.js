@@ -19,7 +19,7 @@ exports.createSauces = (req, res, next) => {
   });
   sauce
     .save()
-    .then(() => res.status(201).json({ message: "sauce enregistré !" }))
+    .then(() => res.status(201).json({ message: "sauce enregistrée !" }))
     .catch((error) => res.status(400).json({ error }));
 };
 
@@ -36,13 +36,13 @@ exports.modifySauces = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: "unauthorized request!" });
+        res.status(403).json({ message: "demande non autorisée !" });
       } else {
         Sauce.updateOne(
           { _id: req.params.id },
           { ...sauceObject, _id: req.params.id }
         )
-          .then(() => res.status(200).json({ message: "sauce modifié!" }))
+          .then(() => res.status(200).json({ message: "sauce modifiée !" }))
           .catch((error) => res.status(401).json({ error }));
       }
     })
@@ -53,13 +53,13 @@ exports.deleteSauces = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: "Non autorisé!" });
+        res.status(401).json({ message: "demande non autorisée !" });
       } else {
         const filename = sauce.imageUrl.split("/images/")[1];
         // La méthode unlink() du package  fs  vous permet de supprimer un fichier du système de fichiers.
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
-            .then(() => res.status(200).json({ message: "sauce supprimé !" }))
+            .then(() => res.status(200).json({ message: "sauce supprimée !" }))
             .catch((error) => res.status(400).json({ error }));
         });
       }
@@ -94,7 +94,7 @@ exports.likeSauces = (req, res, next) => {
           },
           console.log("----->sauce.usersLiked", sauce.usersLiked)
         )
-          .then(() => res.status(201).json("sauce aimer"))
+          .then(() => res.status(201).json("sauce aimée !"))
           .catch((error) => res.status(400).json({ error }));
       }
       if (
@@ -108,7 +108,7 @@ exports.likeSauces = (req, res, next) => {
             $addToSet: { usersDisliked: req.body.userId },
           }
         )
-          .then(() => res.status(201).json("sauce non aimer"))
+          .then(() => res.status(201).json("sauce non aimée !"))
           .catch((error) => res.status(400).json({ error }));
       }
       if (req.body.like === 0 && sauce.usersLiked.includes(req.body.userId)) {
@@ -116,7 +116,7 @@ exports.likeSauces = (req, res, next) => {
           { _id: req.params.id },
           { $inc: { likes: -1 }, $pull: { usersLiked: req.body.userId } }
         )
-          .then(() => res.status(201).json("Avis neutre"))
+          .then(() => res.status(201).json("Avis neutre !"))
           .catch((error) => res.status(400).json({ error }));
       }
       if (
@@ -127,7 +127,7 @@ exports.likeSauces = (req, res, next) => {
           { _id: req.params.id },
           { $inc: { dislikes: -1 }, $pull: { usersDisliked: req.body.userId } }
         )
-          .then(() => res.status(201).json("Avis neutre"))
+          .then(() => res.status(201).json("Avis neutre !"))
           .catch((error) => res.status(400).json({ error }));
       }
       console.log("----->sauce", sauce);

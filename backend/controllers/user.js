@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../models/user");
 
 exports.signup = (req, res, next) => {
   bcrypt
@@ -16,7 +17,9 @@ exports.signup = (req, res, next) => {
         .then(() => res.status(201).json({ message: "utilisateur créé !" }))
         .catch((err) => {
           console.log("err", err);
-          res.status(400).send("unable to save to database");
+          res
+            .status(400)
+            .send("impossible d'enregistrer dans la base de données !");
         });
     })
     .catch((error) => {
@@ -30,7 +33,7 @@ exports.login = (req, res, next) => {
       if (user === null) {
         res
           .status(401)
-          .json({ message: "paire identifiant/mot de passe incorrecte" });
+          .json({ message: "paire identifiant/mot de passe incorrecte !" });
       } else {
         bcrypt
           .compare(req.body.password, user.password)
@@ -38,11 +41,13 @@ exports.login = (req, res, next) => {
             if (!valid) {
               res
                 .status(401)
-                .json({ message: "paire identifiant/mot de passe incorrecte" });
+                .json({
+                  message: "paire identifiant/mot de passe incorrecte !",
+                });
             } else {
               res.status(200).json({
                 userId: user._id,
-                token: jwt.sign({ userId: user._id }, "RONDOM_TOKEN_SECRET", {
+                token: jwt.sign({ userId: user._id }, `${process.env.SECRET}`, {
                   expiresIn: "24h",
                 }),
               });
